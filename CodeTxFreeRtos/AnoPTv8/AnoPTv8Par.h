@@ -1,0 +1,36 @@
+#ifndef __ANOPTV8PAR_H
+#define __ANOPTV8PAR_H
+#include "AnoPTv8.h"
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+如何定义参数：
+step1：添加引用：#include "AnoPTv8Par.h"
+step2：定义float型参数，或者现有float型变量：float _testpar = 123;
+step3：定义该参数的信息，第一个为指向参数的指针，然后依次是最小值，最大值，缩放倍数，参数名称，参数简介
+		const _st_par_info _testParInfo = {&_testpar, 1,2,100,"test", "test2"};
+step4：在程序合适位置，注册该参数（只执行一次），调用函数：AnoPTv8ParRegister(&_testParInfo);
+step5：此时，就可以利用上位机对该参数进行读写了
+*/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+参数结构体定义，并定义枚举
+*/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+typedef struct {
+    void * 		pval;
+    const int32_t	min;
+    const int32_t	max;
+    const uint32_t	mul;
+    const char		name[20];
+    const char		info[70];
+} __attribute__ ((__packed__)) _st_par_info;
+
+void AnoPTv8ParFrameAnl(const _un_frame_v8 *p);
+int	AnoPTv8ParGetCount(void);
+void AnoPTv8ParRegister(const _st_par_info * _pi);
+const _st_par_info * AnoPTv8ParGetInfo(uint16_t parid);
+int32_t AnoPTv8ParGetVal(uint16_t parid);
+void anoPTv8ParSetVal(uint16_t parid, int32_t val);
+
+#endif

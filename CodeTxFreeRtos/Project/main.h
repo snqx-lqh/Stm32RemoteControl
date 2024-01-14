@@ -8,9 +8,15 @@
 
 #include "bsp_sys.h"
 
+#include "FreeRTOSConfig.h"
+#include "FreeRTOS.h"
+#include "task.h"
+
 #define fp32 float
 
 #define NULL 0
+
+#define PI 3.14
 
 #endif
 

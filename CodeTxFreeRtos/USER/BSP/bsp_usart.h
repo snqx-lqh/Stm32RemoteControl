@@ -15,5 +15,7 @@ GPIO_PinRemapConfig(GPIO_Remap_USART1,ENABLE);
 
 void bsp_usart1_init(u32 bound);
 
+void USART1_Send_Len_Data(uint8_t *sendArray,uint8_t sendLen);
+void USART1_Receive_Len_Data(uint8_t *buffer, uint16_t length);
 #endif
 

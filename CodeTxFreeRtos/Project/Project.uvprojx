@@ -111,12 +111,12 @@
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
           <SimDllArguments> -REMAP</SimDllArguments>
-          <SimDlgDll>DCM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
+          <SimDlgDll>DARMSTM.DLL</SimDlgDll>
+          <SimDlgDllArguments>-pSTM32F103C8</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
           <TargetDllArguments></TargetDllArguments>
-          <TargetDlgDll>TCM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
+          <TargetDlgDll>TARMSTM.DLL</TargetDlgDll>
+          <TargetDlgDllArguments>-pSTM32F103C8</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Project;..\CMSIS\Core;..\CMSIS\STM32F10x;..\Lib\inc;..\USER\BSP;..\USER\APP;..\USER\TASK;..\FreeRTOS;..\FreeRTOS\include;..\FreeRTOS\portable\MemMang;..\FreeRTOS\portable\RVDS\ARM_CM3</IncludePath>
+              <IncludePath>..\Project;..\CMSIS\Core;..\CMSIS\STM32F10x;..\Lib\inc;..\USER\BSP;..\USER\APP;..\USER\TASK;..\FreeRTOS;..\FreeRTOS\include;..\FreeRTOS\portable\MemMang;..\FreeRTOS\portable\RVDS\ARM_CM3;..\LetterShell;..\AnoPTv8</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -558,16 +558,6 @@
               <FilePath>..\USER\BSP\bsp_led.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\BSP\bsp_exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\BSP\bsp_timer.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_adc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\BSP\bsp_adc.c</FilePath>
@@ -608,14 +598,19 @@
               <FilePath>..\USER\APP\keyscan.c</FilePath>
             </File>
             <File>
-              <FileName>mytime.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\APP\mytime.c</FilePath>
-            </File>
-            <File>
               <FileName>ahrs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\APP\ahrs.c</FilePath>
+            </File>
+            <File>
+              <FileName>utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\APP\utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\APP\filter.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -641,6 +636,21 @@
               <FileName>gui_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK\gui_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TASK\shell_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>rc_data_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TASK\rc_data_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>ano_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TASK\ano_task.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -696,6 +706,76 @@
               <FileName>FreeRTOSConfig.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\FreeRTOS\include\FreeRTOSConfig.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LetterShell</GroupName>
+          <Files>
+            <File>
+              <FileName>shell.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LetterShell\shell.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_cmd_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LetterShell\shell_cmd_list.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_companion.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LetterShell\shell_companion.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_ext.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LetterShell\shell_ext.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LetterShell\shell_port.c</FilePath>
+            </File>
+            <File>
+              <FileName>shell_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\LetterShell\shell_cfg.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>AnoPTv8</GroupName>
+          <Files>
+            <File>
+              <FileName>AnoPTv8Cmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\AnoPTv8\AnoPTv8Cmd.c</FilePath>
+            </File>
+            <File>
+              <FileName>AnoPTv8FrameFactory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\AnoPTv8\AnoPTv8FrameFactory.c</FilePath>
+            </File>
+            <File>
+              <FileName>AnoPTv8Par.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\AnoPTv8\AnoPTv8Par.c</FilePath>
+            </File>
+            <File>
+              <FileName>AnoPTv8Run.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\AnoPTv8\AnoPTv8Run.c</FilePath>
+            </File>
+            <File>
+              <FileName>HWInterface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\AnoPTv8\HWInterface.c</FilePath>
+            </File>
+            <File>
+              <FileName>AnoPTv8.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\AnoPTv8\AnoPTv8.h</FilePath>
             </File>
           </Files>
         </Group>

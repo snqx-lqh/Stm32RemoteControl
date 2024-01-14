@@ -1,32 +1,52 @@
-#include "user_task.h"
+/**
+  ******************************************************************************
+  * @file    user_task.c 
+  * @author  少年潜行(snqx-lgh)
+  * @version V
+  * @date    2024-01-10
+  * @brief   用户普通任务，拿来做一些检测性质的任务
+  ******************************************************************************
+  * @attention
+  *
+  *
+  * <h2><center>&copy; Copyright 2024 LQH,China</center></h2>
+  ******************************************************************************
+  */#include "user_task.h"
 
-#include "keyscan.h"
-#include "mytime.h"
-#include "mpu6050.h"
-#include "ahrs.h"
+extern TaskHandle_t   USERTask_Handler;
+extern TaskHandle_t   NRFTask_Handler;
+extern TaskHandle_t   GUITask_Handler;
+extern TaskHandle_t   RC_DATATask_Handler;
 
-float gyro[3]   = {0};
-float acc[3]    = {0};
-float angle[3]  = {0};
+void userTaskGetStackHighWaterMark(void);
 
 void user_task(void *pvParameters)
 {
 	
 	while(1)
-	{
-		KeyScan(0);
-		MPU_Get_Gyro(&gyrox,&gyroy,&gyroz);
-		MPU_Get_Acc(&accx,&accy,&accz);
-		gyro[0] = gyrox * MPU6050_GYRO_2000_SEN;
-		gyro[1] = gyroy * MPU6050_GYRO_2000_SEN;
-		gyro[2] = gyroz * MPU6050_GYRO_2000_SEN;
-		acc[0]  = accx  * MPU6050_ACCEL_2G_SEN;
-		acc[1]  = accy  * MPU6050_ACCEL_2G_SEN;
-		acc[2]  = accz  * MPU6050_ACCEL_2G_SEN;
-		MahonyImuUpdate(gyro[0],gyro[1],gyro[2],acc[0],acc[1],acc[2],angle);
-		
-		MyTimeSecondRun();
-		MyTimeFun();
+	{	
+		//userTaskGetStackHighWaterMark();
 		vTaskDelay(5);
+	}
+}
+
+void userTaskGetStackHighWaterMark()
+{
+	UBaseType_t uxHighWaterMark;
+	static uint8_t count = 0;
+	count ++;
+	if(count > 200)
+	{
+		count = 0;
+		uxHighWaterMark = uxTaskGetStackHighWaterMark( USERTask_Handler ); 
+		printf("USERTask_Handler:%lu\r\n",uxHighWaterMark); 
+		uxHighWaterMark = uxTaskGetStackHighWaterMark( NRFTask_Handler ); 
+		printf("NRFTask_Handler:%lu\r\n",uxHighWaterMark); 
+		uxHighWaterMark = uxTaskGetStackHighWaterMark( GUITask_Handler ); 
+		printf("GUITask_Handler:%lu\r\n",uxHighWaterMark); 
+		uxHighWaterMark = uxTaskGetStackHighWaterMark( RC_DATATask_Handler ); 
+		printf("RC_DATATask_Handler:%lu\r\n",uxHighWaterMark); 
+	//	uxHighWaterMark = uxTaskGetStackHighWaterMark( USERTask_Handler ); 
+	//    printf("%lu\r\n",uxHighWaterMark); 
 	}
 }

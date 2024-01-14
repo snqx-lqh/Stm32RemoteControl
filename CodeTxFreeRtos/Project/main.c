@@ -15,7 +15,6 @@
 #include "nrf24l01.h"
 #include "GUI.h"
 #include "keyscan.h"
-#include "mytime.h"
 
 #include "start_task.h"
 
@@ -25,17 +24,11 @@ int main()
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 	bsp_usart1_init(115200);
 	delay_init();
+
 	bsp_led_init();
-	bsp_exti_init();
-	//bsp_tim3_init(5000,72);
 	bsp_adc_init();
 	bsp_key_init();
-	
-	MPU_Init();
-	OLED_Init();
-	GuiInit();
-	NRF24L01_Init();
-	
+
 	startTask();
     vTaskStartScheduler();
 	

@@ -9,34 +9,57 @@
 #include "user_task.h"
 #include "nrf_task.h"
 #include "gui_task.h"
+#include "rc_data_task.h"
+#include "shell_task.h"
+#include "ano_task.h"
+
+#include "queue.h"
+#include "semphr.h"
 
 #define START_TASK_PRIO 1
 #define START_STK_SIZE  128
-static  TaskHandle_t    StartTask_Handler;
+TaskHandle_t    StartTask_Handler;
 
-#define USER_TASK_PRIO 8
-#define USER_STK_SIZE  512
-static  TaskHandle_t   USERTask_Handler;
+#define USER_TASK_PRIO 5
+#define USER_STK_SIZE  128
+TaskHandle_t   USERTask_Handler;
 
-#define NRF_TASK_PRIO 6
-#define NRF_STK_SIZE  512
-static  TaskHandle_t   NRFTask_Handler;
+#define NRF_TASK_PRIO  5
+#define NRF_STK_SIZE   128
+TaskHandle_t   NRFTask_Handler;
 
-#define GUI_TASK_PRIO 5
-#define GUI_STK_SIZE  512
-static  TaskHandle_t   GUITask_Handler;
+#define GUI_TASK_PRIO  5
+#define GUI_STK_SIZE   256
+TaskHandle_t   GUITask_Handler;
+
+#define RC_DATA_TASK_PRIO 7
+#define RC_DATA_STK_SIZE  256
+TaskHandle_t      RC_DATATask_Handler;
+
+#define SHELL_TASK_PRIO    5
+#define SHELL_STK_SIZE     256
+TaskHandle_t         SHELLTask_Handler;
+
+#define ANO_TASK_PRIO    5
+#define ANO_STK_SIZE     256
+TaskHandle_t         ANOTask_Handler;
+
+SemaphoreHandle_t rcDataMutexSemaphore;	//互斥信号量
 
 void start_task(void *pvParameters)
 {
     taskENTER_CRITICAL();           //进入临界区
 
+	//互斥量
+	rcDataMutexSemaphore=xSemaphoreCreateMutex();
+	//任务
     xTaskCreate((TaskFunction_t)user_task,          //任务函数
                 (const char *)"user_task",          //任务名称
                 (uint16_t)USER_STK_SIZE,            //任务堆栈大小
                 (void *)NULL,                        //传递给任务函数的参数
                 (UBaseType_t)USER_TASK_PRIO,        //任务优先级
                 (TaskHandle_t *)&USERTask_Handler); //任务句柄
-	
+		
 	xTaskCreate((TaskFunction_t)nrf_task,          //任务函数
                 (const char *)"nrf_task",          //任务名称
                 (uint16_t)NRF_STK_SIZE,            //任务堆栈大小
@@ -50,6 +73,27 @@ void start_task(void *pvParameters)
                 (void *)NULL,                        //传递给任务函数的参数
                 (UBaseType_t)GUI_TASK_PRIO,        //任务优先级
                 (TaskHandle_t *)&GUITask_Handler); //任务句柄
+				
+	xTaskCreate((TaskFunction_t)rc_data_task,          //任务函数
+                (const char *)"rc_data_task",          //任务名称
+                (uint16_t)RC_DATA_STK_SIZE,            //任务堆栈大小
+                (void *)NULL,                        //传递给任务函数的参数
+                (UBaseType_t)RC_DATA_TASK_PRIO,        //任务优先级
+                (TaskHandle_t *)&RC_DATATask_Handler); //任务句柄
+	
+//	xTaskCreate((TaskFunction_t)shell_task,          //任务函数
+//                (const char *)"shell_task",          //任务名称
+//                (uint16_t)SHELL_STK_SIZE,            //任务堆栈大小
+//                (void *)NULL,                        //传递给任务函数的参数
+//                (UBaseType_t)SHELL_TASK_PRIO,        //任务优先级
+//                (TaskHandle_t *)&SHELLTask_Handler); //任务句柄
+				
+//	xTaskCreate((TaskFunction_t)ano_task,          //任务函数
+//                (const char *)"ano_task",          //任务名称
+//                (uint16_t)ANO_STK_SIZE,            //任务堆栈大小
+//                (void *)NULL,                        //传递给任务函数的参数
+//                (UBaseType_t)ANO_TASK_PRIO,        //任务优先级
+//                (TaskHandle_t *)&ANOTask_Handler); //任务句柄
 				
     vTaskDelete(StartTask_Handler); //删除开始任务
     taskEXIT_CRITICAL();            //退出临界区

@@ -1,11 +1,18 @@
 #include "bsp_usart.h"
 #include "stdio.h"
 
+#include "shell.h"
+
+extern Shell shell;
+extern void AnoPTv8HwRecvByte(uint8_t dat);
+
 void DebugUsartMain()
 {
     u8 res;
     res = USART_ReceiveData(USART1);
-    USART_SendData(USART1,res);
+    //USART_SendData(USART1,res);
+	//shellHandler(&shell,res);
+	AnoPTv8HwRecvByte(res);
 }
 
 void USART1_IRQHandler(void)
@@ -30,13 +37,35 @@ int fputc(int ch, FILE *f)
 }
 
 ///重定向c库函数scanf到串口，重写向后可使用scanf、getchar等函数
-int fgetc(FILE *f)
-{
-    /* 等待串口输入数据 */
-    while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
+//int fgetc(FILE *f)
+//{
+//    /* 等待串口输入数据 */
+//    while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
 
-    return (int)USART_ReceiveData(USART1);
+//    return (int)USART_ReceiveData(USART1);
+//}
+
+void USART1_Send_Len_Data(uint8_t *sendArray,uint8_t sendLen)
+{
+	int i = 0;
+	for(i=0;i<sendLen;i++)
+	{
+		USART_SendData(USART1, sendArray[i]);//向串口1发送数据
+		while(USART_GetFlagStatus(USART1,USART_FLAG_TC)!=SET);//等待发送结束				
+	}	
 }
+
+void USART1_Receive_Len_Data(uint8_t *buffer, uint16_t length) 
+{
+    for (uint16_t i = 0; i < length; ++i) {
+        // 等待接收数据就绪
+        while (!(USART1->SR & USART_SR_RXNE));
+
+        // 从数据寄存器读取接收到的数据
+        buffer[i] = USART1->DR;
+    }
+}
+
 
 void bsp_usart1_init(u32 bound)
 {
