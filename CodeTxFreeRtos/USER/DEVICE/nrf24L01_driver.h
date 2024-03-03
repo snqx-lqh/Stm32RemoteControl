@@ -1,45 +1,24 @@
-#ifndef _NRF24L01_H
-#define _NRF24L01_H
+#ifndef _NRF24L01_DRIVER_H
+#define _NRF24L01_DRIVER_H
 
-#include "main.h"
+#include <stdint.h>
 
-//SPI的时钟信号     
-#define NRF24L01_SCK_RCC        RCC_APB2Periph_GPIOA
-#define NRF24L01_SCK_GPIO       GPIOA
-#define NRF24L01_SCK_GPIO_PIN   GPIO_Pin_5
-#define NRF24L01_SCK            PAout(5)
-//SPI的MISO信号  
-#define NRF24L01_MISO_RCC       RCC_APB2Periph_GPIOA
-#define NRF24L01_MISO_GPIO      GPIOA
-#define NRF24L01_MISO_GPIO_PIN  GPIO_Pin_6
-#define NRF24L01_MISO           PAin(6)
-//SPI的MOSI信号  
-#define NRF24L01_MOSI_RCC       RCC_APB2Periph_GPIOA
-#define NRF24L01_MOSI_GPIO      GPIOA
-#define NRF24L01_MOSI_GPIO_PIN  GPIO_Pin_7
-#define NRF24L01_MOSI           PAout(7)
-//SPI的片选信号  
-#define NRF24L01_CSN_RCC        RCC_APB2Periph_GPIOB
-#define NRF24L01_CSN_GPIO       GPIOB
-#define NRF24L01_CSN_GPIO_PIN   GPIO_Pin_3
-#define NRF24L01_CSN            PBout(3)
-//24L01模式控制信号
-#define NRF24L01_CE_RCC         RCC_APB2Periph_GPIOA
-#define NRF24L01_CE_GPIO        GPIOA
-#define NRF24L01_CE_GPIO_PIN    GPIO_Pin_4
-#define NRF24L01_CE             PAout(4)
-//IRQ主机数据输入
-#define NRF24L01_IRQ_RCC        RCC_APB2Periph_GPIOA
-#define NRF24L01_IRQ_GPIO       GPIOA
-#define NRF24L01_IRQ_GPIO_PIN   GPIO_Pin_15
-#define NRF24L01_IRQ            PAin(15)
+struct nrf24L01_operations{
+	int     (*io_init)        (void);
+	void    (*set_csn_level)  (unsigned char data);
+	void    (*set_ce_level)   (unsigned char data);
+	uint8_t (*read_write_byte)(unsigned char data);
+	uint8_t (*read_irq_data)  (void);
+};
+
+void nrf24L01_operation_register(struct nrf24L01_operations *nrf24L01_oper);
 
 void NRF24L01_Init(void);
 void NRF24L01_RX_Mode(void);
 void NRF24L01_TX_Mode(void);
-u8 NRF24L01_TxPacket(u8 *txbuf);
-u8 NRF24L01_RxPacket(u8 *rxbuf);
-u8 NRF24L01_Check(void);
+uint8_t NRF24L01_TxPacket(uint8_t *txbuf);
+uint8_t NRF24L01_RxPacket(uint8_t *rxbuf);
+uint8_t NRF24L01_Check(void);
 
 //NRF24L01寄存器操作命令
 #define NRF_READ_REG    0x00  //读配置寄存器,低5位为寄存器地址

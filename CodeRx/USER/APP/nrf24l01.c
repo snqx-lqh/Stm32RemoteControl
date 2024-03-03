@@ -15,6 +15,9 @@ void NRF24L01_Init(void)
 	
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_SPI1, ENABLE );
     
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);
+	
 	//时钟信号
 	GPIO_InitStructure.GPIO_Pin = NRF24L01_SCK_GPIO_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;  //复用推挽输出

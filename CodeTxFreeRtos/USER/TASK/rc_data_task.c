@@ -17,7 +17,8 @@
 #include "semphr.h"
 
 #include "bsp_adc.h"
-#include "mpu6050.h"
+#include "mpu6050_middle.h"
+#include "mpu6050_driver.h"
 #include "bsp_key.h"
 #include "keyscan.h"
 #include "ahrs.h"
@@ -31,12 +32,17 @@ rc_data_t rc_data;
 void rc_data_task(void *pvParameters)
 {
 	rc_data_t rc_data_temp;
+	angle_kalman_filter_t angle_kalman_filter_x ;
+	angle_kalman_filter_t angle_kalman_filter_y ;
 	float gyro[3]   = {0};
 	float acc[3]    = {0};
+	float gyroy_temp,gyrox_temp;
+	float accy_temp,accx_temp;
 	rc_data_init(&rc_data_temp);
 	rc_data_init(&rc_data);
-	
-	MPU_Init();
+	kalman_filter_v1_init(&angle_kalman_filter_x);
+	kalman_filter_v1_init(&angle_kalman_filter_y);
+	mpu6050_middle_init();
 	
 	while(1)
 	{
@@ -51,8 +57,8 @@ void rc_data_task(void *pvParameters)
 		
 		KeyScan(0);
 		//读取陀螺仪的值
-		MPU_Get_Gyro(&rc_data_temp.gyro[0],&rc_data_temp.gyro[1],&rc_data_temp.gyro[2]);
-		MPU_Get_Acc(&rc_data_temp.acc[0]  ,&rc_data_temp.acc[1] ,&rc_data_temp.acc[2]);
+		mpu6050_get_gyro(&rc_data_temp.gyro[0],&rc_data_temp.gyro[1],&rc_data_temp.gyro[2]);
+		mpu6050_get_acc(&rc_data_temp.acc[0]  ,&rc_data_temp.acc[1] ,&rc_data_temp.acc[2]);
 		
 		gyro[0] = rc_data_temp.gyro[0] * MPU6050_GYRO_2000_SEN;
 		gyro[1] = rc_data_temp.gyro[1] * MPU6050_GYRO_2000_SEN;
@@ -61,21 +67,16 @@ void rc_data_task(void *pvParameters)
 		acc[1]  = rc_data_temp.acc[1]  * MPU6050_ACCEL_2G_SEN;
 		acc[2]  = rc_data_temp.acc[2]  * MPU6050_ACCEL_2G_SEN;
 		
-		MPU_Get_Gyro(&gyrox,&gyroy,&gyroz);
-		MPU_Get_Acc(&accx,&accy,&accz);
-		
-		accy=atan2(accx,accz)*180/PI;                 //计算倾角	
-		gyroy=gyroy/16.4;                             //陀螺仪量程转换	
-		
-		Kalman_Filter(accy,-gyroy);
-		
-//		MPU_Get_Gyro(&gyrox,&gyroy,&gyroz);
-//		MPU_Get_Acc(&accx,&accy,&accz);
+//		accy_temp =atan2(rc_data_temp.acc[0],rc_data_temp.acc[2])*180/PI;                 //计算倾角	
+//		gyroy_temp=-rc_data_temp.gyro[1]/16.4;                             //陀螺仪量程转换	
 //		
-//		accx=atan2(accy,accz)*180/PI;                 //计算倾角	
-//		gyrox=gyrox/16.4;                             //陀螺仪量程转换	
+//		kalman_filter_v1(&angle_kalman_filter_y,&accy_temp,&gyroy_temp,&rc_data_temp.angle[1]);
 //		
-//		Kalman_Filter(accx,-gyrox);
+//		accx_temp =atan2(rc_data_temp.acc[1],rc_data_temp.acc[2])*180/PI;                 //计算倾角	
+//		gyrox_temp=-rc_data_temp.gyro[0]/16.4;                             //陀螺仪量程转换	
+//		
+//		kalman_filter_v1(&angle_kalman_filter_x,&accx_temp,&gyrox_temp,&rc_data_temp.angle[0]);
+		
 		
 		MahonyImuUpdate(gyro[0],gyro[1],gyro[2],acc[0],acc[1],acc[2],rc_data_temp.angle);
 		

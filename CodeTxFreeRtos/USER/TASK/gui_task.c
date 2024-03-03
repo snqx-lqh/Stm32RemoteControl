@@ -15,21 +15,24 @@
 #include "gui_task.h"
 
 #include "GUI.h"
-#include "oled.h"
+#include "ssd1306_oled_driver.h"
+#include "ssd1306_oled_middle.h"
 #include "bmp.h"
 
 #include "semphr.h"
 #include "rc_data_task.h"
+#include "game_task.h"
 
+extern TaskHandle_t   GUITask_Handler;
 extern struct Menu_t *menuPoint;
 extern SemaphoreHandle_t rcDataMutexSemaphore;
 
-void userMainSet();
+void userMainSet(void);
 void userGuiDataDisplayRefresh(struct Menu_t *menuPoint);
 
 void gui_task(void *pvParameters)
 {
-	OLED_Init();
+	oled1306_middle_init();
 	GuiInit();
 	while(1)
 	{
@@ -51,7 +54,7 @@ struct Menu_t menuMain[4]=
 	{&menuMainProperty,"menuMain","last menu     ", NULL,NULL, &MainUI,NULL},
 	{&menuMainProperty,"menuMain","adc value     ", NULL,NULL, &MainUI,NULL},
 	{&menuMainProperty,"menuMain","state         ", NULL,NULL, &MainUI,NULL},
-	{&menuMainProperty,"menuMain","              ", NULL,NULL, &MainUI,NULL}
+	{&menuMainProperty,"menuMain","game          ", NULL,NULL, &MainUI,NULL}
 };
 //adc value的子菜单
 struct MenuProperty_t setMenu1Property={6,2};
@@ -69,17 +72,56 @@ struct MenuProperty_t setMenu2Property={4,0};
 struct Menu_t setMenu2[4]=
 {
 	{&setMenu2Property,"setMenu2","last menu      ",NULL, NULL, menuMain,NULL},
-	{&setMenu2Property,"setMenu2","               ",NULL, NULL, menuMain,NULL},
-	{&setMenu2Property,"setMenu2","               ",NULL, NULL, menuMain,NULL},
-	{&setMenu2Property,"setMenu2","               ",NULL, NULL, menuMain,NULL}
+	{&setMenu2Property,"setMenu2","anglex         ",NULL, NULL, menuMain,NULL},
+	{&setMenu2Property,"setMenu2","angley         ",NULL, NULL, menuMain,NULL},
+	{&setMenu2Property,"setMenu2","anglez         ",NULL, NULL, menuMain,NULL}
 };
+
+void game1_create(void);
+void game2_create(void);
+
+//game的子菜单
+struct MenuProperty_t setMenu3Property={4,0};
+struct Menu_t setMenu3[4]=
+{
+	{&setMenu3Property,"setMenu2","last menu      ",NULL, NULL, menuMain,NULL},
+	{&setMenu3Property,"setMenu2","ball game      ",NULL, game1_create, menuMain,NULL},
+	{&setMenu3Property,"setMenu2","snake game     ",NULL, game2_create, menuMain,NULL},
+	{&setMenu3Property,"setMenu2","game3          ",NULL, NULL, menuMain,NULL}
+};
+
+
+static TaskHandle_t         GAME1Task_Handler;
+void game1_create()
+{
+	xTaskCreate((TaskFunction_t)game_task,          //任务函数
+                (const char *)"game_task",          //任务名称
+                (uint16_t)256,            //任务堆栈大小
+                (void *)((uint16_t)1),                        //传递给任务函数的参数
+                (UBaseType_t)6,        //任务优先级
+                (TaskHandle_t *)&GAME1Task_Handler); //任务句柄
+	vTaskSuspend(GUITask_Handler);
+}
+
+static TaskHandle_t         GAME2Task_Handler;
+void game2_create()
+{
+	xTaskCreate((TaskFunction_t)game_task,          //任务函数
+                (const char *)"game_task",          //任务名称
+                (uint16_t)256,            //任务堆栈大小
+                (void *)((uint16_t)2),                        //传递给任务函数的参数
+                (UBaseType_t)6,        //任务优先级
+                (TaskHandle_t *)&GAME2Task_Handler); //任务句柄
+	vTaskSuspend(GUITask_Handler);
+}
 
 void userGuiInit()
 {
 	MainUI.childrenMenu = menuMain;
 	menuMain[1].childrenMenu = setMenu1;
 	menuMain[2].childrenMenu = setMenu2;
-	menuPoint = &MainUI;
+	menuMain[3].childrenMenu = setMenu3;
+	menuPoint = setMenu3;
 }
 
 void userMainSet( )
@@ -107,7 +149,9 @@ void userGuiDataDisplayRefresh(struct Menu_t *menuPoint)
 	}
 	else if(menuPoint==setMenu2)
 	{
-		
+		sprintf((char*)setMenu2[1].displayString,"anglex %2.2f   ",rc_data_temp.angle[0]);
+		sprintf((char*)setMenu2[2].displayString,"angley %2.2f   ",rc_data_temp.angle[1]);
+		sprintf((char*)setMenu2[3].displayString,"anglez %2.2f   ",rc_data_temp.angle[2]);
 	}
 	
 }

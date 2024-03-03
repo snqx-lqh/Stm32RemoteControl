@@ -1,18 +1,28 @@
 #include "bsp_usart.h"
 #include "stdio.h"
 
+#if CONFIG_LETTER_SHELL_ENABLE
 #include "shell.h"
-
 extern Shell shell;
+#endif
+
+#if CONFIG_ANO_ENABLE
 extern void AnoPTv8HwRecvByte(uint8_t dat);
+#endif
 
 void DebugUsartMain()
 {
-    u8 res;
+    uint8_t res;
     res = USART_ReceiveData(USART1);
     //USART_SendData(USART1,res);
+	
+	#if CONFIG_LETTER_SHELL_ENABLE
 	//shellHandler(&shell,res);
+	#endif
+	
+	#if CONFIG_ANO_ENABLE
 	AnoPTv8HwRecvByte(res);
+	#endif
 }
 
 void USART1_IRQHandler(void)

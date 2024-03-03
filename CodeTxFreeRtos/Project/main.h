@@ -18,5 +18,8 @@
 
 #define PI 3.14
 
+#define  CONFIG_LETTER_SHELL_ENABLE 0
+#define  CONFIG_ANO_ENABLE          0
+
 #endif
 

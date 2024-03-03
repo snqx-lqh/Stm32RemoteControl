@@ -2,22 +2,12 @@
 
 #include "bsp_delay.h"
 #include "bsp_usart.h"
-#include "bsp_sys.h"
 
 #include "bsp_led.h"
-#include "bsp_exti.h"
-#include "bsp_timer.h"
 #include "bsp_adc.h"
 #include "bsp_key.h"
 
-#include "mpu6050.h"
-#include "oled.h"
-#include "nrf24l01.h"
-#include "GUI.h"
-#include "keyscan.h"
-
 #include "start_task.h"
-
 
 int main()
 {

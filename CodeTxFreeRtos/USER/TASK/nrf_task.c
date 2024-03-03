@@ -14,7 +14,8 @@
   */
 #include "nrf_task.h"
 
-#include "nrf24l01.h"
+#include "nrf24L01_middle.h"
+#include "nrf24L01_driver.h"
 #include "utils.h"
 #include "semphr.h"
 #include "rc_data_task.h"
@@ -28,7 +29,7 @@ void nrf24l01_tx(void);
 
 void nrf_task(void *pvParameters)
 {
-	NRF24L01_Init();
+	nrf24L01_middle_init();
 	check_nrf = NRF24L01_Check();
 	NRF24L01_TX_Mode();
 	while(1)

@@ -9,7 +9,9 @@
  * 
  */
 #include "GUI.h"
-#include "oled.h"
+
+#include "ssd1306_oled_driver.h"
+#include "ssd1306_oled_middle.h"
 
 #include "keyscan.h"
 
