@@ -20,10 +20,17 @@ struct Menu_t{
 	struct Menu_t *childrenMenu;//当前菜单的子级菜单	
 };
 
+struct gui_operations {
+	void (*userGuiInit)(void);
+	void (*userMainSet)(void);
+	void (*userGuiDataDisplayRefresh)(struct Menu_t *menuPoint);
+	char *main_ui_name;
+	int  (*guiGetValue)(void);
+};
+
+void gui_operations_register(struct gui_operations *gui_oper);
 void GuiInit(void);
-void GuiControl(void);
-void DisplayRefreash(struct Menu_t *nowMenu,u8 selectItem,u8 scrollBar);
-void DisplayRefreashData(struct Menu_t *nowMenu,u8 selectItem,u8 scrollBar);
-void GuiDataDisplayRefresh(struct Menu_t *menuPoint);
+void GuiKeyControl(void);
+void DisplayRefreash(struct Menu_t *nowMenu);
 
 #endif

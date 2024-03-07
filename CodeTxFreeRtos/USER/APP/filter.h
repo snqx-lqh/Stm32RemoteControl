@@ -19,8 +19,8 @@ typedef struct {
 
 void kalman_filter_v1_init(angle_kalman_filter_t *angle_kalman_filter);
 void kalman_filter_v1(angle_kalman_filter_t *angle_kalman_filter,float *Accel,float *Gyro,float *angle);
-void FirstOrderLowPassFilter(float angle_m, float gyro_m);
-void Kalman_Filter(float Accel,float Gyro);
+void FirstOrderLowPassFilter(float angle_m, float gyro_m,float *angle);
+
 
 #endif
 

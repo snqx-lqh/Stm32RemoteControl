@@ -32,7 +32,7 @@ static void draw_game_box(uint8_t score,uint8_t life ,uint8_t level)
 
 void snake_game_run()
 {
-	OLED_Clear();
+	OLED_Clear_Buff();
 	draw_game_box(1,2 ,3);
 	OLED_Refresh();
 	while(1)
@@ -41,7 +41,7 @@ void snake_game_run()
 		{
 			isKeyUp = 0;
 			vTaskResume(GUITask_Handler);
-			OLED_Clear();
+			OLED_Clear_Buff();
 			OLED_Refresh();
 			vTaskDelete(NULL);
 		}

@@ -76,6 +76,19 @@ void OLED_Refresh(void)
 		
     }
 }
+//清屏BUFF
+void OLED_Clear_Buff(void)
+{
+    uint8_t i,n;
+    for(i=0; i<8; i++)
+    {
+        for(n=0; n<128; n++)
+        {
+            OLED_GRAM[i][n]=0;//清除所有数据
+        }
+    }
+}
+
 //清屏函数
 void OLED_Clear(void)
 {

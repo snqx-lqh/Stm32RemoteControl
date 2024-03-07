@@ -13,6 +13,7 @@ void KeyUp()
 	if(isKeyUp == 0)
 		isKeyUp=1;
 	LED=!LED;
+	//put_key(1);
 }
 
 void KeyDown()
@@ -20,6 +21,7 @@ void KeyDown()
 	if(isKeyDown == 0)
 		isKeyDown=1;
 	LED = !LED;
+	//put_key(2);
 }
 
 void KeyLeft()
@@ -27,6 +29,7 @@ void KeyLeft()
 	if(isKeyLeft == 0)
 		isKeyLeft=1;
 	LED = !LED;
+	//put_key(3);
 }
 
 void KeyRight()
@@ -34,8 +37,47 @@ void KeyRight()
 	if(isKeyRight == 0)
 		isKeyRight=1;
 	LED = !LED;
+	//put_key(4);
 }
 
+//环形缓冲区的按键扫描函数，感觉不太好用，就没用了。
+
+#define KEY_BUFF_LEN 20
+int g_keys[KEY_BUFF_LEN] = {0};
+int key_r = 0,key_w = 0;
+
+#define NEXT_POS(x) ((x+1) % KEY_BUFF_LEN)
+
+static int is_key_buff_empty(void)
+{
+	return (key_r == key_w); //一开始key_r和key_w都是0，key_r==key_w表示空
+}
+
+static int is_key_buff_full(void)
+{
+	//下一个写的位置等于key_r，表示存满了
+	return (key_r == NEXT_POS(key_w));
+}
+
+void put_key(int key)
+{
+	if(!is_key_buff_full())
+	{
+		g_keys[key_w] = key;
+		key_w  = NEXT_POS(key_w);
+	}
+}
+
+int get_key()
+{
+	int key = 0;
+	if(!is_key_buff_empty())
+	{
+		key = g_keys[key_r];
+		key_r  = NEXT_POS(key_r);
+	}
+	return key;
+}
 
 /**
  * @brief 按键扫描函数
