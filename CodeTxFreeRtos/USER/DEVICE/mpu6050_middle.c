@@ -123,7 +123,7 @@ void mpu6050_middle_init()
 {
 	//初始化IIC总线
 	soft_i2c_init(&mpu_soft_iic);     
-	//注册6050操作函数
+	//初始化6050
 	mpu6050_init(&mpu6050_oper);
 }
 

@@ -244,9 +244,6 @@ void oled1306_middle_init()
 
 void oled1306_example()
 {
-
 	OLED_ShowString(&ssd1306_oled_oper,0,0,"HELLO",16,1);
 	OLED_Refresh(&ssd1306_oled_oper);
-	
-	
 }
