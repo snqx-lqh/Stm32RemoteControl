@@ -48,6 +48,7 @@ void gui_task(void *pvParameters)
 	GuiInit();
 	while(1)
 	{
+		//oled1306_example();
 		DisplayRefreash(menuPoint);
 		vTaskDelay(20);
 	}
@@ -136,7 +137,7 @@ void userGuiInit()
 
 void userMainSet( )
 {
-	OLED_ShowPicture(29,0,65,60,(uint8_t *)BMP7,1);
+	OLED_ShowPicture(&ssd1306_oled_oper,29,0,65,60,(uint8_t *)BMP7,1);
 }
 
 void userGuiDataDisplayRefresh(struct Menu_t *menuPoint)

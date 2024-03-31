@@ -3,22 +3,22 @@
 
 #include <stdint.h>
 
-struct nrf24L01_operations{
+typedef struct nrf24L01_operations{
 	int     (*io_init)        (void);
 	void    (*set_csn_level)  (unsigned char data);
 	void    (*set_ce_level)   (unsigned char data);
 	uint8_t (*read_write_byte)(unsigned char data);
 	uint8_t (*read_irq_data)  (void);
-};
+}nrf24L01_oper_t;
 
 void nrf24L01_operation_register(struct nrf24L01_operations *nrf24L01_oper);
 
-void NRF24L01_Init(void);
-void NRF24L01_RX_Mode(void);
-void NRF24L01_TX_Mode(void);
-uint8_t NRF24L01_TxPacket(uint8_t *txbuf);
-uint8_t NRF24L01_RxPacket(uint8_t *rxbuf);
-uint8_t NRF24L01_Check(void);
+void NRF24L01_Init(nrf24L01_oper_t *p_nrf24L01_operations);
+void NRF24L01_RX_Mode(nrf24L01_oper_t *p_nrf24L01_operations);
+void NRF24L01_TX_Mode(nrf24L01_oper_t *p_nrf24L01_operations);
+uint8_t NRF24L01_TxPacket(nrf24L01_oper_t *p_nrf24L01_operations,uint8_t *txbuf);
+uint8_t NRF24L01_RxPacket(nrf24L01_oper_t *p_nrf24L01_operations,uint8_t *rxbuf);
+uint8_t NRF24L01_Check(nrf24L01_oper_t *p_nrf24L01_operations);
 
 //NRF24L01¼Ä´æÆ÷²Ù×÷ÃüÁî
 #define NRF_READ_REG    0x00  //¶ÁÅäÖÃ¼Ä´æÆ÷,µÍ5Î»Îª¼Ä´æÆ÷µØÖ·

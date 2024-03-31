@@ -53,7 +53,7 @@ void MainUiSet()
 void DisplayRefreash(struct Menu_t *nowMenu)
 {
 	int i = 0;
-	OLED_Clear_Buff();
+	OLED_Clear_Buff(&ssd1306_oled_oper);
 	gui_key_value = p_gui_operations->guiGetValue();
 	GuiKeyControl();
 	p_gui_operations->userGuiDataDisplayRefresh(nowMenu);
@@ -62,14 +62,14 @@ void DisplayRefreash(struct Menu_t *nowMenu)
 		MainUiSet();
 	}else 
 	{	
-		OLED_ShowChar(0,selectItem*16,     '>',16,1);//画出当前选中菜单项在当前显示菜单页的索引
+		OLED_ShowChar(&ssd1306_oled_oper,0,selectItem*16,     '>',16,1);//画出当前选中菜单项在当前显示菜单页的索引
 		//显示菜单项的内容
 		for(i=0;i<(nowMenu->MenuProperty->MenuLen-nowMenu->MenuProperty->scrollBarLen);i++)
 		{
-			OLED_ShowString(8,i*16,nowMenu[i+scrollBar].displayString,16,1);
+			OLED_ShowString(&ssd1306_oled_oper,8,i*16,nowMenu[i+scrollBar].displayString,16,1);
 		}
 	}
-	OLED_Refresh();
+	OLED_Refresh(&ssd1306_oled_oper);
 }
 
 /**

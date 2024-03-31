@@ -19,10 +19,10 @@
 #define NRF24L01_MOSI_GPIO_PIN  GPIO_Pin_7
 #define NRF24L01_MOSI           PAout(7)
 //SPI的片选信号  
-#define NRF24L01_CSN_RCC        RCC_APB2Periph_GPIOB
-#define NRF24L01_CSN_GPIO       GPIOB
-#define NRF24L01_CSN_GPIO_PIN   GPIO_Pin_3
-#define NRF24L01_CSN            PBout(3)
+#define NRF24L01_CSN_RCC        RCC_APB2Periph_GPIOC
+#define NRF24L01_CSN_GPIO       GPIOC
+#define NRF24L01_CSN_GPIO_PIN   GPIO_Pin_4
+#define NRF24L01_CSN            PCout(4)
 //24L01模式控制信号
 #define NRF24L01_CE_RCC         RCC_APB2Periph_GPIOA
 #define NRF24L01_CE_GPIO        GPIOA
@@ -31,8 +31,8 @@
 //IRQ主机数据输入
 #define NRF24L01_IRQ_RCC        RCC_APB2Periph_GPIOA
 #define NRF24L01_IRQ_GPIO       GPIOA
-#define NRF24L01_IRQ_GPIO_PIN   GPIO_Pin_15
-#define NRF24L01_IRQ            PAin(15)
+#define NRF24L01_IRQ_GPIO_PIN   GPIO_Pin_1
+#define NRF24L01_IRQ            PAin(1)
 
 void NRF24L01_Init(void);
 void NRF24L01_RX_Mode(void);

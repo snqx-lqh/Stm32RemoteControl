@@ -63,24 +63,20 @@ void oled_soft_iic_sda_in(void)
     GPIO_Init(OLED_SDA_GPIO, &GPIO_InitStructure);
 }
 
-void oled_iic_sda_high(void)
+void oled_set_iic_sda_level(unsigned char level)
 {
-	OLED_SDA_GPIO->BSRR = OLED_SDA_GPIO_PIN;
+	if(0 == level)
+		OLED_SDA_GPIO->BRR = OLED_SDA_GPIO_PIN;
+	else
+		OLED_SDA_GPIO->BSRR = OLED_SDA_GPIO_PIN;
 }
 
-void oled_iic_sda_low(void)
+void oled_set_iic_scl_level(unsigned char level)
 {
-	OLED_SDA_GPIO->BRR = OLED_SDA_GPIO_PIN;
-}
-
-void oled_iic_scl_high(void)
-{
-	OLED_SCL_GPIO->BSRR = OLED_SCL_GPIO_PIN;
-}
-
-void oled_iic_scl_low(void)
-{
-	OLED_SCL_GPIO->BRR = OLED_SCL_GPIO_PIN;
+	if(0 == level)
+		OLED_SCL_GPIO->BRR = OLED_SCL_GPIO_PIN;
+	else
+		OLED_SCL_GPIO->BSRR = OLED_SCL_GPIO_PIN;
 }
 
 uint8_t oled_iic_sda_read(void)
@@ -88,72 +84,37 @@ uint8_t oled_iic_sda_read(void)
 	return GPIO_ReadInputDataBit(OLED_SDA_GPIO,OLED_SDA_GPIO_PIN);
 }
 
-static soft_i2c_t oled_soft_iic={
+void oled_iic_delay()
+{
+	
+}
+
+soft_i2c_t oled_soft_iic={
 	.soft_i2c_init = oled_soft_i2c_init,
 	.soft_iic_sda_out = oled_soft_iic_sda_out, 
 	.soft_iic_sda_in = oled_soft_iic_sda_in,
-	.iic_sda_high = oled_iic_sda_high,
-	.iic_sda_low = oled_iic_sda_low,
-	.iic_scl_high = oled_iic_scl_high,
-	.iic_scl_low = oled_iic_scl_low,
-	.iic_sda_read = oled_iic_sda_read
+	.set_iic_sda_level = oled_set_iic_sda_level,
+	.set_iic_scl_level = oled_set_iic_scl_level,
+	.iic_sda_read = oled_iic_sda_read,
+	.iic_delay    = oled_iic_delay
 };
 
-void OLED_WR_Byte(uint8_t dat,uint8_t mode)
-{	
-	soft_iic_start(&oled_soft_iic);
-    soft_iic_send_byte(&oled_soft_iic,0x78);
-    soft_iic_wait_ack(&oled_soft_iic);
-    if(mode) {
-        soft_iic_send_byte(&oled_soft_iic,0x40);
-    }
-    else {
-        soft_iic_send_byte(&oled_soft_iic,0x00);
-    }
-    soft_iic_wait_ack(&oled_soft_iic);
-    soft_iic_send_byte(&oled_soft_iic,dat);
-    soft_iic_wait_ack(&oled_soft_iic);
-    soft_iic_stop(&oled_soft_iic);
-}
-
-void OLED_WR_Data_Bytes(u8 *dat)
+int oled_write_byte(unsigned char reg,unsigned char data)
 {
-	u8 n;
-    soft_iic_start(&oled_soft_iic);
-    soft_iic_send_byte(&oled_soft_iic,0x78);
-    soft_iic_wait_ack(&oled_soft_iic);
-	soft_iic_send_byte(&oled_soft_iic,0x40);
-	soft_iic_wait_ack(&oled_soft_iic);
-	for(n=0; n<128; n++)
-	{
-		soft_iic_send_byte(&oled_soft_iic,dat[n]);
-		soft_iic_wait_ack(&oled_soft_iic);
-	}
-	soft_iic_stop(&oled_soft_iic);
-}
-
-int oled_write_byte(unsigned char data,unsigned char cmd)
-{
-	OLED_WR_Byte(data,cmd);
+	soft_iic_write_dev_one_byte(&oled_soft_iic,0x78>>1,reg,data);
 	return 0;
 }
 
-int oled_write_bytes(unsigned char *data)
+int oled_write_bytes(unsigned char reg,unsigned char *data,unsigned int len)
 {
-	OLED_WR_Data_Bytes(data);
+	soft_iic_write_dev_len_byte(&oled_soft_iic,0x78>>1,reg,len,data);
 	return 0;
 }
 
-int oled_rst()
-{
-	return 0;
-}
-
-struct ssd1306_oled_operations ssd1306_oled_oper = {
-	.write_byte  =     oled_write_byte,
-	.iic_or_spi  =     IIC_MODE,                  
-	.write_bytes =     oled_write_bytes,
-	.oled_rst    =     oled_rst
+ssd1306_oled_oper_t ssd1306_oled_oper = {
+	.iic_write_one_byte  =     oled_write_byte,
+	.iic_write_len_byte  =     oled_write_bytes,
+	.iic_or_spi          =     IIC_MODE
 };
 
 #else
@@ -189,65 +150,85 @@ void oled_soft_spi_init(void)
     GPIO_Init(OLED_DC_GPIO, &GPIO_InitStructure);
     GPIO_SetBits(OLED_DC_GPIO,OLED_DC_GPIO_PIN);
 }
-void oled_soft_spi_sck_high(void)
+
+void oled_set_spi_sck_level(unsigned char level)
 {
-	OLED_SCL_Set();
+	if(0 == level)
+		OLED_SCL_Clr();
+	else
+		OLED_SCL_Set();
 }
-void oled_soft_spi_sck_low(void)
-{
-	OLED_SCL_Clr();
-}
-void oled_soft_spi_mosi_high(void)
+
+void oled_set_spi_mosi_level(unsigned char level)
 {
 	OLED_SDA_Set();
+	if(0 == level)
+		OLED_SDA_Clr();
+	else
+		OLED_SDA_Set();
 }
-void oled_soft_spi_mosi_low(void)
-{
-	OLED_SDA_Clr();
-}
+
 uint8_t oled_soft_spi_miso_read(void)
 {
 	
 }
 
-struct soft_spi_operations oled_soft_spi = {
-	.spi_init      = oled_soft_spi_init,
-	.spi_sck_high  = oled_soft_spi_sck_high,
-	.spi_sck_low   = oled_soft_spi_sck_low,
-	.spi_mosi_high = oled_soft_spi_mosi_high,
-	.spi_mosi_low  = oled_soft_spi_mosi_low,
-	.spi_miso_read = oled_soft_spi_miso_read	 
+soft_spi_t oled_soft_spi = {
+	.spi_init             = oled_soft_spi_init,
+	.set_spi_sck_level    = oled_set_spi_sck_level,
+	.set_spi_mosi_level   = oled_set_spi_mosi_level,
+	.spi_miso_read        = oled_soft_spi_miso_read,
+	.spi_mode             = 3
 };
 
-int oled_write_byte(unsigned char data,unsigned char cmd)
+int oled_spi_write_one_byte(unsigned char data)
 {
-	if(cmd)
-        OLED_DC_Set();
-    else
-        OLED_DC_Clr();
-    OLED_CS_Clr();
-    SPI_ReadWriteByte_Mode3(&oled_soft_spi,data);
-    OLED_CS_Set();
-    OLED_DC_Set();
+	soft_spi_read_write_byte(&oled_soft_spi,data);
 	return 0;
 }
 
-int oled_write_bytes(unsigned char *data)
+int oled_spi_write_len_byte(unsigned char *data,unsigned int len)
 {
+	int i = 0;
+	for(i = 0;i < 128;i++)
+		soft_spi_read_write_byte(&oled_soft_spi,data[i]);
 	return 0;
 }
 
-int oled_rst()
+void oled_set_dc_level(unsigned char level)
 {
-	return 0;
+	if(0 == level)
+		OLED_DC_Clr();
+	else
+		OLED_DC_Set();
 }
 
-struct ssd1306_oled_operations ssd1306_oled_oper = {
-	.write_byte  =     oled_write_byte,
-	.iic_or_spi  =     SPI_MODE,                  
-	.oled_rst    =     oled_rst
+void oled_set_cs_level(unsigned char level)
+{
+	if(0 == level)
+		OLED_CS_Clr();
+	else
+		OLED_CS_Set();
+}
+
+void oled_set_res_level(unsigned char level)
+{
+	if(0 == level)
+		OLED_RES_Clr();
+	else
+		OLED_RES_Set();
+}
+
+ssd1306_oled_oper_t ssd1306_oled_oper = {
+	.spi_write_one_byte  =     oled_spi_write_one_byte,
+	.spi_write_len_byte  =     oled_spi_write_len_byte,                  
+	.set_dc_level        =     oled_set_dc_level,
+	.set_cs_level        =     oled_set_cs_level,
+	.set_res_level       =     oled_set_res_level,
+	.delay_ms            =     delay_ms,
+
+	.iic_or_spi          =     SPI_MODE
 };
-
 #endif
 
 void oled1306_middle_init()
@@ -256,19 +237,16 @@ void oled1306_middle_init()
 	//初始化IIC总线
 	soft_i2c_init(&oled_soft_iic); 
 	#else
-	SOFT_SPI_Init(&oled_soft_spi);
+	soft_spi_init(&oled_soft_spi);
 	#endif
-	//注册6050操作函数
-	ssd1306_oled_operation_register(&ssd1306_oled_oper);
-	OLED_Init();
+	OLED_Init(&ssd1306_oled_oper);
 }
 
 void oled1306_example()
 {
-	while(1)
-	{
-		OLED_ShowString(0,0,"HELLO",16,1);
-		OLED_Refresh();
-	}
+
+	OLED_ShowString(&ssd1306_oled_oper,0,0,"HELLO",16,1);
+	OLED_Refresh(&ssd1306_oled_oper);
+	
 	
 }

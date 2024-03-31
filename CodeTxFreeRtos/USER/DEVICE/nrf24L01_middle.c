@@ -55,7 +55,7 @@ uint8_t nrf24L01_read_irq_data  (void)
 	return GPIO_ReadInputDataBit(NRF24L01_IRQ_GPIO,NRF24L01_IRQ_GPIO_PIN);
 }
 
-struct nrf24L01_operations nrf24L01_oper = {
+nrf24L01_oper_t nrf24L01_oper = {
 	.io_init= nrf24L01_io_init,
 	.set_csn_level= nrf24L01_set_csn_level,
 	.set_ce_level= nrf24L01_set_ce_level,
@@ -66,6 +66,5 @@ struct nrf24L01_operations nrf24L01_oper = {
 void nrf24L01_middle_init()
 {
 	SPI2_Init();
-	nrf24L01_operation_register(&nrf24L01_oper);
-	NRF24L01_Init();
+	NRF24L01_Init(&nrf24L01_oper);
 }

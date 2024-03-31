@@ -71,4 +71,6 @@
 void oled1306_middle_init(void);
 void oled1306_example(void);
 
+extern struct ssd1306_oled_operations ssd1306_oled_oper;
+
 #endif

@@ -4,23 +4,21 @@
 #include <stdint.h>
 
 struct mpu6050_operations{
-	int (*write_one_byte)(unsigned char reg,unsigned char data);
-	int (*read_one_byte )(unsigned char reg,unsigned char *data);
-	int (*read_bytes    )(unsigned char reg,unsigned char *data,unsigned char len);
+	int (*iic_write_one_byte)(unsigned char reg,unsigned char data);
+	int (*iic_read_one_byte )(unsigned char reg,unsigned char *data);
+	int (*iic_read_len_byte )(unsigned char reg,unsigned char *data,unsigned char len);
 	void (*delay_ms)     (unsigned short ms);
 };
 
-void mpu6050_operation_register(struct mpu6050_operations *mpu6050_oper);
+int mpu6050_init(struct mpu6050_operations *p_mpu6050_operations);
+uint8_t mpu6050_set_gyro_fsr(struct mpu6050_operations *p_mpu6050_operations,uint8_t fsr);
+uint8_t mpu6050_set_acc_fsr(struct mpu6050_operations *p_mpu6050_operations,uint8_t fsr);
+uint8_t mpu6050_set_lpf(struct mpu6050_operations *p_mpu6050_operations,uint16_t lpf);
+uint8_t mpu6050_set_rate(struct mpu6050_operations *p_mpu6050_operations,uint16_t rate);
 
-int mpu6050_init(void);
-uint8_t mpu6050_set_gyro_fsr(uint8_t fsr);
-uint8_t mpu6050_set_acc_fsr(uint8_t fsr);
-uint8_t mpu6050_set_lpf(uint16_t lpf);
-uint8_t mpu6050_set_rate(uint16_t rate);
-
-short mpu6050_get_temperature(void);
-uint8_t mpu6050_get_gyro(short *gx,short *gy,short *gz);
-uint8_t mpu6050_get_acc(short *ax,short *ay,short *az);
+short mpu6050_get_temperature(struct mpu6050_operations *p_mpu6050_operations);
+uint8_t mpu6050_get_gyro(struct mpu6050_operations *p_mpu6050_operations,short *gx,short *gy,short *gz);
+uint8_t mpu6050_get_acc(struct mpu6050_operations *p_mpu6050_operations,short *ax,short *ay,short *az);
 
 #define GYRO_250DPS            0
 #define GYRO_500DPS            1

@@ -60,24 +60,20 @@ void mpu_soft_iic_sda_in(void)
     GPIO_Init(IIC_SDA_PORT, &GPIO_InitStructure);
 }
 
-void mpu_iic_sda_high(void)
+void mpu_set_iic_sda_level(unsigned char level)
 {
-	GPIO_SetBits(IIC_SDA_PORT,IIC_SDA_PIN);
+	if(0 == level)
+		IIC_SDA_PORT->BRR = IIC_SDA_PIN;
+	else
+		IIC_SDA_PORT->BSRR = IIC_SDA_PIN;
 }
 
-void mpu_iic_sda_low(void)
+void mpu_set_iic_scl_level(unsigned char level)
 {
-	GPIO_ResetBits(IIC_SDA_PORT,IIC_SDA_PIN);
-}
-
-void mpu_iic_scl_high(void)
-{
-	GPIO_SetBits(IIC_SCL_PORT,IIC_SCL_PIN);
-}
-
-void mpu_iic_scl_low(void)
-{
-	GPIO_ResetBits(IIC_SCL_PORT,IIC_SCL_PIN);
+	if(0 == level)
+		IIC_SCL_PORT->BRR = IIC_SCL_PIN;
+	else
+		IIC_SCL_PORT->BSRR = IIC_SCL_PIN;
 }
 
 uint8_t mpu_iic_sda_read(void)
@@ -85,16 +81,19 @@ uint8_t mpu_iic_sda_read(void)
 	return GPIO_ReadInputDataBit(IIC_SDA_PORT,IIC_SDA_PIN);
 }
 
-//初始化MPU6050软件IIC操作函数
-static soft_i2c_t mpu_soft_iic={
+void mpu_iic_delay()
+{
+	
+}
+
+soft_i2c_t mpu_soft_iic={
 	.soft_i2c_init = mpu_soft_i2c_init,
 	.soft_iic_sda_out = mpu_soft_iic_sda_out, 
 	.soft_iic_sda_in = mpu_soft_iic_sda_in,
-	.iic_sda_high = mpu_iic_sda_high,
-	.iic_sda_low = mpu_iic_sda_low,
-	.iic_scl_high = mpu_iic_scl_high,
-	.iic_scl_low = mpu_iic_scl_low,
-	.iic_sda_read = mpu_iic_sda_read
+	.set_iic_sda_level = mpu_set_iic_sda_level,
+	.set_iic_scl_level = mpu_set_iic_scl_level,
+	.iic_sda_read = mpu_iic_sda_read,
+	.iic_delay    = mpu_iic_delay
 };
 
 int mpu6050_write_one_byte(unsigned char reg,unsigned char data)
@@ -104,8 +103,7 @@ int mpu6050_write_one_byte(unsigned char reg,unsigned char data)
 }
 int mpu6050_read_one_byte (unsigned char reg,unsigned char *data)
 {
-	*data = soft_iic_read_dev_one_byte(&mpu_soft_iic,MPU6050_ADDR,reg);
-	return 0;
+	return soft_iic_read_dev_one_byte(&mpu_soft_iic,MPU6050_ADDR,reg,data);;
 }
 int mpu6050_read_bytes    (unsigned char reg,unsigned char *data,unsigned char len)
 {
@@ -115,9 +113,9 @@ int mpu6050_read_bytes    (unsigned char reg,unsigned char *data,unsigned char l
 
 //初始化MPU6050操作函数
 struct mpu6050_operations mpu6050_oper = {
-	.write_one_byte = mpu6050_write_one_byte,
-	.read_one_byte  = mpu6050_read_one_byte,
-	.read_bytes     = mpu6050_read_bytes,
+	.iic_write_one_byte = mpu6050_write_one_byte,
+	.iic_read_one_byte  = mpu6050_read_one_byte,
+	.iic_read_len_byte  = mpu6050_read_bytes,
 	.delay_ms       = delay_ms
 };
 
@@ -126,8 +124,7 @@ void mpu6050_middle_init()
 	//初始化IIC总线
 	soft_i2c_init(&mpu_soft_iic);     
 	//注册6050操作函数
-	mpu6050_operation_register(&mpu6050_oper);
-	mpu6050_init();
+	mpu6050_init(&mpu6050_oper);
 }
 
 short gyro[3];
@@ -138,7 +135,7 @@ void mpu6050_example()
 	
 	while(1)
 	{
-		mpu6050_get_gyro(&gyro[0],&gyro[1],&gyro[2]);
+		mpu6050_get_gyro(&mpu6050_oper,&gyro[0],&gyro[1],&gyro[2]);
 		
 	}
 }

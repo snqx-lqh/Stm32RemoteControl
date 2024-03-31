@@ -54,11 +54,11 @@ void rc_data_task(void *pvParameters)
 
 		rc_data_temp.key_value = (KEY_UP << 7)|(KEY_DOWN << 6)|(KEY_LEFT << 5)|(KEY_RIGHT << 4)| \
 								 (KEY_YG_L << 3)|(KEY_YG_R << 2)|(KEY_BM_L << 1)|(KEY_BM_R << 0);
-		
+		//读取按键的值
 		KeyScan(0);
 		//读取陀螺仪的值
-		mpu6050_get_gyro(&rc_data_temp.gyro[0],&rc_data_temp.gyro[1],&rc_data_temp.gyro[2]);
-		mpu6050_get_acc(&rc_data_temp.acc[0]  ,&rc_data_temp.acc[1] ,&rc_data_temp.acc[2]);
+		mpu6050_get_gyro(&mpu6050_oper,&rc_data_temp.gyro[0],&rc_data_temp.gyro[1],&rc_data_temp.gyro[2]);
+		mpu6050_get_acc(&mpu6050_oper,&rc_data_temp.acc[0]  ,&rc_data_temp.acc[1] ,&rc_data_temp.acc[2]);
 		
 		gyro[0] = rc_data_temp.gyro[0] * MPU6050_GYRO_2000_SEN;
 		gyro[1] = rc_data_temp.gyro[1] * MPU6050_GYRO_2000_SEN;
@@ -77,7 +77,7 @@ void rc_data_task(void *pvParameters)
 //		
 //		kalman_filter_v1(&angle_kalman_filter_x,&accx_temp,&gyrox_temp,&rc_data_temp.angle[0]);
 		
-		
+		//计算角度值
 		MahonyImuUpdate(gyro[0],gyro[1],gyro[2],acc[0],acc[1],acc[2],rc_data_temp.angle);
 		
 		// 等待互斥量，确保在写入共享数据时不会被其他任务中断

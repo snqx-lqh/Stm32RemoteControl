@@ -21,4 +21,6 @@
 void mpu6050_middle_init(void);
 void mpu6050_example(void);
 
+extern struct mpu6050_operations mpu6050_oper;
+
 #endif

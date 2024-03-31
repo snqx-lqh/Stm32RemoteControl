@@ -21,6 +21,7 @@
 #include "rc_data_task.h"
 
 extern SemaphoreHandle_t rcDataMutexSemaphore;
+extern nrf24L01_oper_t nrf24L01_oper;
 
 int16_t check_nrf = 0;
 uint8_t check_tx  = 0;
@@ -30,12 +31,12 @@ void nrf24l01_tx(void);
 void nrf_task(void *pvParameters)
 {
 	nrf24L01_middle_init();
-	check_nrf = NRF24L01_Check();
-	NRF24L01_TX_Mode();
+	check_nrf = NRF24L01_Check(&nrf24L01_oper);
+	NRF24L01_TX_Mode(&nrf24L01_oper);
 	while(1)
 	{
 		nrf24l01_tx();
-		vTaskDelay(50);
+		vTaskDelay(500);
 	}
 }
 
@@ -94,5 +95,5 @@ void nrf24l01_tx()
 	
 	nrf_tx_buff[28] = 0x3A;
 	
-	check_tx = NRF24L01_TxPacket(nrf_tx_buff);
+	check_tx = NRF24L01_TxPacket(&nrf24L01_oper,nrf_tx_buff);
 }

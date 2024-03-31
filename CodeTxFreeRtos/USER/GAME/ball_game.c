@@ -1,6 +1,7 @@
 #include "ball_game.h"
 
 #include "ssd1306_oled_driver.h"
+#include "ssd1306_oled_middle.h"
 #include "keyscan.h"
 #include "rc_data_task.h"
 #include "semphr.h"
@@ -33,18 +34,18 @@ static uint8_t ball_speed_count = 4;
 static void draw_game_box(uint8_t score,uint8_t life ,uint8_t level)
 {
 	//画一个游戏边框
-	OLED_DrawLine(0,0, 127,0,1);
-	OLED_DrawLine(0,63,127,63,1);
-	OLED_DrawLine(0,0,0,63,1);
-	OLED_DrawLine(127,0,127,63,1);
-	OLED_DrawLine(GM_BOX_LEFT,0,GM_BOX_LEFT,63,1);
+	OLED_DrawLine(&ssd1306_oled_oper,0,0, 127,0,1);
+	OLED_DrawLine(&ssd1306_oled_oper,0,63,127,63,1);
+	OLED_DrawLine(&ssd1306_oled_oper,0,0,0,63,1);
+	OLED_DrawLine(&ssd1306_oled_oper,127,0,127,63,1);
+	OLED_DrawLine(&ssd1306_oled_oper,GM_BOX_LEFT,0,GM_BOX_LEFT,63,1);
 	//写上参数
-	OLED_ShowString(2,2, "score",12,1);
-	OLED_ShowNum(2,14,score,3,8,1);
-	OLED_ShowString(2,22,"life ",12,1);
-	OLED_ShowNum(2,34,life,3,8,1);
-	OLED_ShowString(2,42,"level",12,1);
-	OLED_ShowNum(2,54,level,3,8,1);
+	OLED_ShowString(&ssd1306_oled_oper,2,2, "score",12,1);
+	OLED_ShowNum(&ssd1306_oled_oper,2,14,score,3,8,1);
+	OLED_ShowString(&ssd1306_oled_oper,2,22,"life ",12,1);
+	OLED_ShowNum(&ssd1306_oled_oper,2,34,life,3,8,1);
+	OLED_ShowString(&ssd1306_oled_oper,2,42,"level",12,1);
+	OLED_ShowNum(&ssd1306_oled_oper,2,54,level,3,8,1);
 }
 
 void ball_init()
@@ -57,12 +58,12 @@ void ball_init()
 
 void draw_ball()
 {
-	OLED_DrawCircle(ball_pos_x,ball_pos_y,BALL_RADIUS,1);
+	OLED_DrawCircle(&ssd1306_oled_oper,ball_pos_x,ball_pos_y,BALL_RADIUS,1);
 }
 
 void draw_ball_clear()
 {
-	OLED_DrawCircle(ball_pos_x_last,ball_pos_y_last,BALL_RADIUS,0);
+	OLED_DrawCircle(&ssd1306_oled_oper,ball_pos_x_last,ball_pos_y_last,BALL_RADIUS,0);
 }
 
 void ball_move()
@@ -89,14 +90,14 @@ void ball_move()
 
 void draw_board()
 {
-	OLED_DrawLine(board_pos_x,board_pos_y,board_pos_x+board_length,board_pos_y,1);
-	OLED_DrawLine(board_pos_x,board_pos_y+1,board_pos_x+board_length,board_pos_y+1,1);
+	OLED_DrawLine(&ssd1306_oled_oper,board_pos_x,board_pos_y,board_pos_x+board_length,board_pos_y,1);
+	OLED_DrawLine(&ssd1306_oled_oper,board_pos_x,board_pos_y+1,board_pos_x+board_length,board_pos_y+1,1);
 }
 
 void draw_board_clear()
 {
-	OLED_DrawLine(board_pos_x_last,board_pos_y_last,board_pos_x_last+board_length,board_pos_y_last,0);
-	OLED_DrawLine(board_pos_x_last,board_pos_y_last+1,board_pos_x_last+board_length,board_pos_y_last+1,0);
+	OLED_DrawLine(&ssd1306_oled_oper,board_pos_x_last,board_pos_y_last,board_pos_x_last+board_length,board_pos_y_last,0);
+	OLED_DrawLine(&ssd1306_oled_oper,board_pos_x_last,board_pos_y_last+1,board_pos_x_last+board_length,board_pos_y_last+1,0);
 }
 
 void board_move(uint8_t  key_value)
@@ -125,19 +126,19 @@ void ball_game_run()
 	uint8_t  restart_flag = 0;
 	uint8_t  stop_flag = 0;
 	
-	OLED_Clear_Buff();
+	OLED_Clear_Buff(&ssd1306_oled_oper);
 	sprintf((char*)showStr,"level %u",level);
-	OLED_ShowString(55,25,showStr,16,1);
+	OLED_ShowString(&ssd1306_oled_oper,55,25,showStr,16,1);
 	draw_game_box(score,life ,level);
-	OLED_Refresh();
+	OLED_Refresh(&ssd1306_oled_oper);
 	vTaskDelay(1000);
-	OLED_Clear_Buff();
+	OLED_Clear_Buff(&ssd1306_oled_oper);
 	draw_game_box(score,life ,level);
-	OLED_Refresh();
+	OLED_Refresh(&ssd1306_oled_oper);
 	
 	while(1)
 	{	
-		OLED_Clear_Buff();
+		OLED_Clear_Buff(&ssd1306_oled_oper);
 		// 等待互斥量，确保在写入共享数据时不会被其他任务中断
 		if (xSemaphoreTake(rcDataMutexSemaphore, portMAX_DELAY) == pdTRUE) {
 			// 更新共享数据
@@ -200,7 +201,7 @@ void ball_game_run()
 				draw_board();
 			}else if(stop_flag==1)
 			{
-				OLED_ShowString(55,25,"you win",16,1);
+				OLED_ShowString(&ssd1306_oled_oper,55,25,"you win",16,1);
 				//OLED_Refresh();
 				if(isKeyDown == 1){
 					isKeyDown = 0;
@@ -215,7 +216,7 @@ void ball_game_run()
 			}else if(stop_flag==2)
 			{
 				sprintf((char*)showStr,"level %u",level + 1);
-				OLED_ShowString(55,25,showStr,16,1);
+				OLED_ShowString(&ssd1306_oled_oper,55,25,showStr,16,1);
 				delay_count ++;
 				if(delay_count > 20){
 					delay_count = 0;
@@ -231,7 +232,7 @@ void ball_game_run()
 		}else if(life == 0)
 		{
 			if(restart_flag == 0 ){
-				OLED_ShowString(50,25,"game_over",16,1);
+				OLED_ShowString(&ssd1306_oled_oper,50,25,"game_over",16,1);
 				
 				if(isKeyDown == 1)
 				{
@@ -243,7 +244,7 @@ void ball_game_run()
 			{
 				level = 1;
 				sprintf((char*)showStr,"level %u",level);
-				OLED_ShowString(55,25,showStr,16,1);
+				OLED_ShowString(&ssd1306_oled_oper,55,25,showStr,16,1);
 				delay_count ++;
 				if(delay_count > 20){
 					delay_count = 0;
@@ -255,14 +256,14 @@ void ball_game_run()
 				}
 			}	
 		}
-		OLED_Refresh();
+		OLED_Refresh(&ssd1306_oled_oper);
 		
 		if(isKeyUp == 1)
 		{
 			isKeyUp = 0;
 			vTaskResume(GUITask_Handler);
-			OLED_Clear_Buff();
-			OLED_Refresh();
+			OLED_Clear_Buff(&ssd1306_oled_oper);
+			OLED_Refresh(&ssd1306_oled_oper);
 			vTaskDelete(NULL);
 		}
 		vTaskDelay(10);
