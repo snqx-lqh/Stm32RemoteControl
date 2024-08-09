@@ -2,6 +2,10 @@
 
 该项目是一个基于FreeRTOS系统的Stm32遥控器设计。使用该项目主要学习FreeRTOS的使用，以及模块化编程的思想。
 
+2024/08/09更新说明
+
+上传了一个设计的接收的模块，NRFLink，是使用买的那种贴片的NRF制作的，但是好像有点Bug，容易坏。
+
 # 项目开源
 
 github:https://github.com/snqx-lqh/Stm32RemoteControl
