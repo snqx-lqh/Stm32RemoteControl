@@ -44,9 +44,9 @@ NRFLink 设计的一个接收转发数据模块，实现类似串口透传的功
 
 ### 实物展示
 
-![](06_Image/ykq.png)
+![](05_Image/ykq.png)
 
-![](06_Image/ykq2.jpg)
+![](05_Image/ykq2.jpg)
 
 ## 软件设计
 
