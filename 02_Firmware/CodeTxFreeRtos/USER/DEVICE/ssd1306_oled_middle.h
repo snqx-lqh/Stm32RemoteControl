@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-//#define IIC_USE 
+#define IIC_USE 
 
 #ifdef IIC_USE
 
